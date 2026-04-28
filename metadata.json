@@ -1,0 +1,5 @@
+{
+  "name": "MathVortex Lab",
+  "description": "An interactive linear algebra learning platform for vector dependency and independence visualization.",
+  "requestFramePermissions": []
+}
