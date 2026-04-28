@@ -40,6 +40,7 @@ const NavItem = React.memo(({ item, isActive }: { item: typeof mainNavItems[0], 
   return (
     <Link
       to={item.path}
+      onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
       className="flex flex-col items-center gap-1 relative py-2 group flex-1 min-w-0"
     >
       <div className={cn(
@@ -152,7 +153,10 @@ export default function BottomNav({ isMoreOpen, setIsMoreOpen }: { isMoreOpen: b
                     <Link
                       key={item.path}
                       to={item.path}
-                      onClick={() => setIsMoreOpen(false)}
+                      onClick={() => {
+                        setIsMoreOpen(false);
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                      }}
                       className="flex items-center gap-3 p-4 bg-slate-50 rounded-2xl border border-slate-100 hover:bg-slate-100 transition-colors group"
                     >
                       <div className="p-2 bg-white rounded-xl shadow-sm text-slate-400 group-hover:text-primary group-hover:bg-primary/5 transition-all">
@@ -164,7 +168,10 @@ export default function BottomNav({ isMoreOpen, setIsMoreOpen }: { isMoreOpen: b
                 })}
                 <Link
                   to="/feedback"
-                  onClick={() => setIsMoreOpen(false)}
+                  onClick={() => {
+                    setIsMoreOpen(false);
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                  }}
                   className="flex items-center gap-3 p-4 bg-slate-50 rounded-2xl border border-slate-100 hover:bg-slate-100 transition-colors group"
                 >
                   <div className="p-2 bg-white rounded-xl shadow-sm text-slate-400 group-hover:text-primary group-hover:bg-primary/5 transition-all">

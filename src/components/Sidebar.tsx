@@ -75,6 +75,7 @@ export default function Sidebar() {
                 <Link
                   key={item.path}
                   to={item.path}
+                  onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
                   className={cn(
                     "flex items-center gap-3 px-4 py-3 rounded-lg transition-colors group",
                     isActive 
@@ -102,6 +103,7 @@ export default function Sidebar() {
               <div className="space-y-4">
                 <Link 
                   to="/account"
+                  onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
                   className="flex items-center justify-between p-3 bg-gray-50 rounded-xl hover:bg-gray-100 transition-all group"
                 >
                   <div className="flex items-center gap-3 overflow-hidden">

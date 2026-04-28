@@ -661,7 +661,10 @@ export default function Simulator() {
           >
             <div className="glass-card p-2 flex items-center justify-between shadow-2xl border-white/20 bg-white/90 backdrop-blur-3xl">
           <button 
-            onClick={() => setActiveTab('input')}
+            onClick={() => {
+              setActiveTab('input');
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }}
             className={cn(
               "flex flex-col items-center gap-1 flex-1 py-2 rounded-2xl transition-all",
               activeTab === 'input' ? "bg-primary text-white shadow-lg" : "text-gray-500 hover:bg-gray-100"
@@ -671,7 +674,10 @@ export default function Simulator() {
             <span className="text-[10px] font-black uppercase">Input</span>
           </button>
           <button 
-            onClick={() => setActiveTab('visual')}
+            onClick={() => {
+              setActiveTab('visual');
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }}
             className={cn(
               "flex flex-col items-center gap-1 flex-1 py-2 rounded-2xl transition-all",
               activeTab === 'visual' ? "bg-primary text-white shadow-lg" : "text-gray-500 hover:bg-gray-100"
@@ -684,6 +690,7 @@ export default function Simulator() {
             onClick={() => {
               setActiveTab('analysis');
               if (!results) calculateResults();
+              window.scrollTo({ top: 0, behavior: 'smooth' });
             }}
             className={cn(
               "flex flex-col items-center gap-1 flex-1 py-2 rounded-2xl transition-all",
