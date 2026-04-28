@@ -219,98 +219,40 @@ export default function Simulator() {
     }
   };
 
-  return (
-    <div className="relative min-h-[calc(100vh-120px)] pb-32 lg:pb-0">
-      {/* Mobile Top App Bar */}
-      <div className="lg:hidden sticky top-0 z-40 bg-background-lab/80 backdrop-blur-xl border-b border-slate-200/50 px-6 py-4 mb-6">
-        <div className="flex items-center justify-between">
-          <h1 className="text-xl font-black text-slate-900 capitalize tracking-tight">{activeTab}</h1>
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary">
-              <Beaker size={16} />
-            </div>
-          </div>
-        </div>
-      </div>
+  const plotData = useMemo(() => {
+    return vectors.map((v, i) => ({
+      type: dimension === 2 ? ('scatter' as const) : ('scatter3d' as const),
+      mode: 'lines+markers' as const,
+      x: [0, v.values[0]],
+      y: [0, v.values[1]],
+      z: dimension === 3 ? [0, v.values[2]] : undefined,
+      name: `V${i + 1}`,
+      line: { color: v.color, width: 8, shape: 'spline' as const },
+      marker: { size: 8, color: v.color, symbol: 'circle' }
+    }));
+  }, [vectors, dimension]);
 
-      {/* Desktop Layout - Side by Side */}
-      <div className="hidden lg:grid lg:grid-cols-12 gap-8 items-start">
-        {/* Left Side: Input Controls */}
-        <div className="lg:col-span-4 space-y-6 sticky top-6">
-          <InputSection />
-        </div>
-
-        {/* Right Side: Visualization & Results */}
-        <div className="lg:col-span-8 space-y-8">
-          <VisualSection />
-          <AnalysisSection />
-        </div>
-      </div>
-
-      {/* Mobile/Tablet Layout - Tabbed Navigation */}
-      <div className="lg:hidden space-y-6">
-        <motion.div
-          key={activeTab}
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -10 }}
-          transition={{ duration: 0.2 }}
-        >
-          {activeTab === 'input' && <InputSection />}
-          {activeTab === 'visual' && <VisualSection />}
-          {activeTab === 'analysis' && <AnalysisSection />}
-        </motion.div>
-      </div>
-
-      {/* Modern Tabbed Bottom Nav (Mobile/Tablet Only) - Repositioned to clear global BottomNav */}
-      <AnimatePresence>
-        {!isMoreOpen && (
-          <motion.div 
-            initial={{ y: 100, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            exit={{ y: 100, opacity: 0 }}
-            className="lg:hidden fixed bottom-28 left-1/2 -translate-x-1/2 w-[90%] max-w-md z-50"
-          >
-            <div className="glass-card p-2 flex items-center justify-between shadow-2xl border-white/20 bg-white/90 backdrop-blur-3xl">
-          <button 
-            onClick={() => setActiveTab('input')}
-            className={cn(
-              "flex flex-col items-center gap-1 flex-1 py-2 rounded-2xl transition-all",
-              activeTab === 'input' ? "bg-primary text-white shadow-lg" : "text-gray-500 hover:bg-gray-100"
-            )}
-          >
-            <Plus size={20} />
-            <span className="text-[10px] font-black uppercase">Input</span>
-          </button>
-          <button 
-            onClick={() => setActiveTab('visual')}
-            className={cn(
-              "flex flex-col items-center gap-1 flex-1 py-2 rounded-2xl transition-all",
-              activeTab === 'visual' ? "bg-primary text-white shadow-lg" : "text-gray-500 hover:bg-gray-100"
-            )}
-          >
-            <Target size={20} />
-            <span className="text-[10px] font-black uppercase">Visual</span>
-          </button>
-          <button 
-            onClick={() => {
-              setActiveTab('analysis');
-              if (!results) calculateResults();
-            }}
-            className={cn(
-              "flex flex-col items-center gap-1 flex-1 py-2 rounded-2xl transition-all",
-              activeTab === 'analysis' ? "bg-primary text-white shadow-lg" : "text-gray-500 hover:bg-gray-100"
-            )}
-          >
-            <Sparkles size={20} />
-            <span className="text-[10px] font-black uppercase">Result</span>
-          </button>
-        </div>
-      </motion.div>
-    )}
-  </AnimatePresence>
-</div>
-  );
+  const plotLayout = useMemo(() => ({
+    autosize: true,
+    margin: { l: 20, r: 20, b: 20, t: 20 },
+    paper_bgcolor: 'rgba(0,0,0,0)',
+    plot_bgcolor: 'rgba(0,0,0,0)',
+    showlegend: true,
+    legend: { 
+      x: 0, 
+      y: 1, 
+      orientation: 'h' as const,
+      font: { family: 'Inter', size: 10, color: '#64748b' } 
+    },
+    scene: {
+      xaxis: { range: [-5, 5], gridcolor: '#e2e8f0', zerolinecolor: '#cbd5e1', title: '' },
+      yaxis: { range: [-5, 5], gridcolor: '#e2e8f0', zerolinecolor: '#cbd5e1', title: '' },
+      zaxis: { range: [-5, 5], gridcolor: '#e2e8f0', zerolinecolor: '#cbd5e1', title: '' },
+      camera: { eye: { x: 1.5, y: 1.5, z: 1.5 } }
+    },
+    xaxis: { range: [-5, 5], gridcolor: '#e2e8f0', zerolinecolor: '#cbd5e1', title: '' },
+    yaxis: { range: [-5, 5], gridcolor: '#e2e8f0', zerolinecolor: '#cbd5e1', title: '' },
+  }), [dimension]);
 
   function InputSection() {
     return (
@@ -417,41 +359,6 @@ export default function Simulator() {
       </div>
     );
   }
-
-  const plotData = useMemo(() => {
-    return vectors.map((v, i) => ({
-      type: dimension === 2 ? ('scatter' as const) : ('scatter3d' as const),
-      mode: 'lines+markers' as const,
-      x: [0, v.values[0]],
-      y: [0, v.values[1]],
-      z: dimension === 3 ? [0, v.values[2]] : undefined,
-      name: `V${i + 1}`,
-      line: { color: v.color, width: 8, shape: 'spline' as const },
-      marker: { size: 8, color: v.color, symbol: 'circle' }
-    }));
-  }, [vectors, dimension]);
-
-  const plotLayout = useMemo(() => ({
-    autosize: true,
-    margin: { l: 20, r: 20, b: 20, t: 20 },
-    paper_bgcolor: 'rgba(0,0,0,0)',
-    plot_bgcolor: 'rgba(0,0,0,0)',
-    showlegend: true,
-    legend: { 
-      x: 0, 
-      y: 1, 
-      orientation: 'h' as const,
-      font: { family: 'Inter', size: 10, color: '#64748b' } 
-    },
-    scene: {
-      xaxis: { range: [-5, 5], gridcolor: '#e2e8f0', zerolinecolor: '#cbd5e1', title: '' },
-      yaxis: { range: [-5, 5], gridcolor: '#e2e8f0', zerolinecolor: '#cbd5e1', title: '' },
-      zaxis: { range: [-5, 5], gridcolor: '#e2e8f0', zerolinecolor: '#cbd5e1', title: '' },
-      camera: { eye: { x: 1.5, y: 1.5, z: 1.5 } }
-    },
-    xaxis: { range: [-5, 5], gridcolor: '#e2e8f0', zerolinecolor: '#cbd5e1', title: '' },
-    yaxis: { range: [-5, 5], gridcolor: '#e2e8f0', zerolinecolor: '#cbd5e1', title: '' },
-  }), [dimension]);
 
   function VisualSection() {
     return (
@@ -699,4 +606,97 @@ export default function Simulator() {
       </div>
     );
   }
+
+  return (
+    <div className="relative min-h-[calc(100vh-120px)] pb-32 lg:pb-0">
+      {/* Mobile Top App Bar */}
+      <div className="lg:hidden sticky top-0 z-40 bg-background-lab/80 backdrop-blur-xl border-b border-slate-200/50 px-6 py-4 mb-6">
+        <div className="flex items-center justify-between">
+          <h1 className="text-xl font-black text-slate-900 capitalize tracking-tight">{activeTab}</h1>
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+              <Beaker size={16} />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Desktop Layout - Side by Side */}
+      <div className="hidden lg:grid lg:grid-cols-12 gap-8 items-start">
+        {/* Left Side: Input Controls */}
+        <div className="lg:col-span-4 space-y-6 sticky top-6">
+          <InputSection />
+        </div>
+
+        {/* Right Side: Visualization & Results */}
+        <div className="lg:col-span-8 space-y-8">
+          <VisualSection />
+          <AnalysisSection />
+        </div>
+      </div>
+
+      {/* Mobile/Tablet Layout - Tabbed Navigation */}
+      <div className="lg:hidden space-y-6">
+        <motion.div
+          key={activeTab}
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -10 }}
+          transition={{ duration: 0.2 }}
+        >
+          {activeTab === 'input' && <InputSection />}
+          {activeTab === 'visual' && <VisualSection />}
+          {activeTab === 'analysis' && <AnalysisSection />}
+        </motion.div>
+      </div>
+
+      {/* Modern Tabbed Bottom Nav (Mobile/Tablet Only) - Repositioned to clear global BottomNav */}
+      <AnimatePresence>
+        {!isMoreOpen && (
+          <motion.div 
+            initial={{ y: 100, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: 100, opacity: 0 }}
+            className="lg:hidden fixed bottom-28 left-1/2 -translate-x-1/2 w-[90%] max-w-md z-50"
+          >
+            <div className="glass-card p-2 flex items-center justify-between shadow-2xl border-white/20 bg-white/90 backdrop-blur-3xl">
+          <button 
+            onClick={() => setActiveTab('input')}
+            className={cn(
+              "flex flex-col items-center gap-1 flex-1 py-2 rounded-2xl transition-all",
+              activeTab === 'input' ? "bg-primary text-white shadow-lg" : "text-gray-500 hover:bg-gray-100"
+            )}
+          >
+            <Plus size={20} />
+            <span className="text-[10px] font-black uppercase">Input</span>
+          </button>
+          <button 
+            onClick={() => setActiveTab('visual')}
+            className={cn(
+              "flex flex-col items-center gap-1 flex-1 py-2 rounded-2xl transition-all",
+              activeTab === 'visual' ? "bg-primary text-white shadow-lg" : "text-gray-500 hover:bg-gray-100"
+            )}
+          >
+            <Target size={20} />
+            <span className="text-[10px] font-black uppercase">Visual</span>
+          </button>
+          <button 
+            onClick={() => {
+              setActiveTab('analysis');
+              if (!results) calculateResults();
+            }}
+            className={cn(
+              "flex flex-col items-center gap-1 flex-1 py-2 rounded-2xl transition-all",
+              activeTab === 'analysis' ? "bg-primary text-white shadow-lg" : "text-gray-500 hover:bg-gray-100"
+            )}
+          >
+            <Sparkles size={20} />
+            <span className="text-[10px] font-black uppercase">Result</span>
+          </button>
+        </div>
+      </motion.div>
+    )}
+  </AnimatePresence>
+</div>
+  );
 }
